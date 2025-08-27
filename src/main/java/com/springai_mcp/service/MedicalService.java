@@ -1,5 +1,6 @@
 package com.springai_mcp.service;
 
+import com.springai_mcp.dto.MedicalReportDTO;
 import com.springai_mcp.dto.PatientDTO;
 import com.springai_mcp.entity.MedicalReport;
 import com.springai_mcp.entity.Patient;
@@ -66,29 +67,33 @@ public class MedicalService {
     }
 
     @Tool(name = "list_reports_for_patient", description = "Get all medical reports for a patient by patient ID")
-    public List<MedicalReport> listReportsForPatient(Long patientId) {
-        return reportRepository.findByPatientId(patientId);
+    public List<MedicalReportDTO> listReportsForPatient(Long patientId) {
+        return reportRepository.findByPatientId(patientId).stream()
+                .map(this::toMedicalReportDTO)
+                .collect(Collectors.toList());
     }
 
     @Tool(name = "add_medical_report", description = "Add a new medical report for a patient by patient ID, diagnosis, and content")
-    public MedicalReport addMedicalReport(Long patientId, String diagnosis, String content) {
+    public MedicalReportDTO addMedicalReport(Long patientId, String diagnosis, String content) {
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new NotFoundException("Patient not found"));
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
         MedicalReport report = new MedicalReport();
         report.setPatient(patient);
         report.setReportDate(LocalDate.now());
         report.setDiagnosis(diagnosis);
         report.setContent(content);
-        return reportRepository.save(report);
+        MedicalReport savedReport = reportRepository.save(report);
+        return toMedicalReportDTO(savedReport);
     }
 
     @Tool(name = "update_medical_report", description = "Update an existing medical report by report ID, new diagnosis, and new content")
-    public MedicalReport updateMedicalReport(Long reportId, String diagnosis, String content) {
+    public MedicalReportDTO updateMedicalReport(Long reportId, String diagnosis, String content) {
         MedicalReport report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new NotFoundException("Report not found"));
+                .orElseThrow(() -> new RuntimeException("Report not found"));
         report.setDiagnosis(diagnosis);
         report.setContent(content);
-        return reportRepository.save(report);
+        MedicalReport updatedReport = reportRepository.save(report);
+        return toMedicalReportDTO(updatedReport);
     }
 
     // Custom exception for not found resources
@@ -104,6 +109,16 @@ public class MedicalService {
         dto.setName(patient.getName());
         dto.setDateOfBirth(patient.getDateOfBirth());
         dto.setGender(patient.getGender());
+        return dto;
+    }
+
+    private MedicalReportDTO toMedicalReportDTO(MedicalReport report) {
+        MedicalReportDTO dto = new MedicalReportDTO();
+        dto.setId(report.getId());
+        dto.setPatientId(report.getPatient().getId());
+        dto.setReportDate(report.getReportDate());
+        dto.setDiagnosis(report.getDiagnosis());
+        dto.setContent(report.getContent());
         return dto;
     }
 }
