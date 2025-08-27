@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "spring-ai-mcp-server": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "D:/AI_ML/Spring-AI-MCP/spring-ai-mcp/target/spring-ai-mcp.jar"
+      ]
+    }
+  }
+}

@@ -1,6 +1,20 @@
+
 # Spring AI MCP (Model Context Protocol)
 
 A Spring Boot application demonstrating a Medical Care Platform (MCP) with AI tool integration via the **Model Context Protocol**. This project manages patients and their medical reports, and exposes AI-enabled service methods for use in AI workflows and assistants like Claude Desktop.
+
+---
+
+## Project Overview
+
+This project is a well-structured Spring Boot application for a Medical Care Platform (MCP) with AI tool integration via MCP. It features:
+
+- JPA entities for `Patient` and `MedicalReport`
+- DTOs for clean data transfer
+- Service layer with MCP tool annotations
+- Spring Data JPA repositories
+- Example data initialization
+- Ready for extension and AI integration
 
 ---
 
@@ -92,26 +106,57 @@ You can customize these prompts based on the tool methods exposed by your servic
 
 ---
 
-## Usage in Claude Desktop or Other MCP Agents
 
-Claude Desktop is an AI-powered desktop assistant that can interact with backend services via APIs or Model Context Protocol tool callbacks. To use this Spring AI MCP app with Claude Desktop or any MCP-compatible agent:
+## Connecting MCP Server to Claude Desktop
 
-1. **Start the Spring AI MCP Application**
-   - Build and run the app as described above.
-   - Ensure the app is running and accessible on your local network or desired endpoint.
+To use your Spring AI MCP server with Claude Desktop, follow these steps:
 
-2. **Configure Your AI Agent**
-   - In Claude Desktop (or another MCP agent), add a new tool or API integration.
-   - Point the agent to the endpoint where your Spring AI MCP app is running.
-   - If using MCP tool callbacks, ensure the agent is configured to recognize the tool methods exposed by your app (e.g., `list_patients`, `get_patient_info`, etc.).
+1. **Build and Start the MCP Server**
+    - Open a terminal in your project directory.
+    - Run the following command to build and start the server:
+       ```
+       ./mvnw clean install
+       ./mvnw spring-boot:run
+       ```
+       Or, run the JAR directly:
+       ```
+       java -jar target/spring-ai-mcp.jar
+       ```
 
-3. **Interact with Medical Tools**
-   - Use the agent’s interface to send requests to the app’s tool endpoints.
-   - Example prompts: "List all patients", "Add a medical report for patient ID 1", etc.
+2. **Configure Claude Desktop**
+    - Open Claude Desktop.
+    - Go to the settings or integrations section.
+    - Add a new MCP server/tool integration.
+    - For the server command, use:
+       ```
+       java -jar D:/AI_ML/Spring-AI-MCP/spring-ai-mcp/target/spring-ai-mcp.jar
+       ```
+       (Adjust the path if your JAR is elsewhere.)
 
-4. **Extend Integration**
-   - Add more annotated service methods in your app for new capabilities.
-   - Register additional services in the main application as tool callbacks.
+    - If Claude Desktop asks for a config file, use the provided `claude_desktop_config.json`:
+       ```json
+       {
+          "mcpServers": {
+             "spring-ai-mcp-server": {
+                "command": "java",
+                "args": [
+                   "-jar",
+                   "D:/AI_ML/Spring-AI-MCP/spring-ai-mcp/target/spring-ai-mcp.jar"
+                ]
+             }
+          }
+       }
+       ```
+
+3. **Test the Connection**
+    - In Claude Desktop, select the Spring AI MCP tool.
+    - Try example prompts such as:
+       - "List all patients."
+       - "Add a new medical report for patient ID 2 with diagnosis 'Diabetes'."
+
+4. **Extend and Customize**
+    - Add more annotated service methods in your Spring Boot app for new capabilities.
+    - Register additional services in `SpringAiMcpApplication` as tool callbacks.
 
 Refer to your AI agent’s documentation for details on adding and configuring external tools.
 
